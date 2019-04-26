@@ -107,10 +107,10 @@ template <typename TFilename, typename TPrefix>
 struct Printer {
   template <typename TSerial, typename TValue>
   Printer(TSerial &serial, const TValue &content) {
-    serial.print(make_string<TFilename>{}.data());
+	serial.print(make_string<TFilename>{}.data());
     serial.print(make_string<TPrefix>{}.data());
     serial.println(content);
-    serial.flush();
+	serial.flush();
   }
 };
 }  // namespace ArduinoTrace
@@ -124,7 +124,7 @@ struct Printer {
 #define ARDUINOTRACE_FLASHIFY(X) X
 #endif
 
-#define ARDUINOTRACE_PRINT(id, file, prefix, content)                         \
+#define ARDUINOTRACE_PRINT(id, file, prefix, content)                	      \
   {                                                                           \
     struct __filename {                                                       \
       constexpr static char const *data() { return file; }                    \
@@ -144,6 +144,12 @@ struct Printer {
 
 #define ARDUINOTRACE_DUMP_PREFIX(line, variable) \
   ":" ARDUINOTRACE_STRINGIFY(line) ": " #variable " = "
+  
+#define ARDUINOTRACE_THROW_PREFIX(line) \
+  ":*****ERROR*****" ARDUINOTRACE_STRINGIFY(line) ": "
+  
+#define ARDUINOTRACE_DEBUG_PREFIX(line) \
+  ":" ARDUINOTRACE_STRINGIFY(line) ": "
 
 // Initializes the Serial port
 //
@@ -169,10 +175,19 @@ struct Printer {
   ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
                      ARDUINOTRACE_DUMP_PREFIX(__LINE__, variable), variable)
 
+#define THROW(message) 						\
+  ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
+					 ARDUINOTRACE_THROW_PREFIX(__LINE__), message)
+
+#define DEBUG(message) 						\
+  ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
+					 ARDUINOTRACE_DEBUG_PREFIX(__LINE__), message)
+
 #else  // ie ARDUINOTRACE_ENABLE == 0
 
 #define ARDUINOTRACE_INIT(bauds)
 #define TRACE()
 #define DUMP(variable)
-
+#define THROW(message)
+#define DEBUG(message)
 #endif
