@@ -147,9 +147,7 @@ struct Printer {
   
 #define ARDUINOTRACE_THROW_PREFIX(line) \
   ":*****ERROR*****" ARDUINOTRACE_STRINGIFY(line) ": "
-  
-#define ARDUINOTRACE_DEBUG_PREFIX(line) \
-  ":" ARDUINOTRACE_STRINGIFY(line) ": "
+
 
 // Initializes the Serial port
 //
@@ -181,7 +179,7 @@ struct Printer {
 
 #define DEBUG(message) 						\
   ARDUINOTRACE_PRINT(__COUNTER__, __FILE__, \
-					 ARDUINOTRACE_DEBUG_PREFIX(__LINE__), message)
+					 ARDUINOTRACE_TRACE_PREFIX(__LINE__), message)
 
 #else  // ie ARDUINOTRACE_ENABLE == 0
 
