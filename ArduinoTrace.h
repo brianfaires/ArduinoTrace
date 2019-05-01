@@ -109,47 +109,57 @@ struct Initializer {
   }
 };
 
-template <typename TLine>
+template <typename TFile>
 struct Printer {
-  template <typename TSerial, typename TFunction, typename TValue, typename TPrefix>
-  Printer(TSerial &serial, const TFunction &function, const TValue &content, TPrefix &prefix) {
+  template <typename TSerial, typename TLine, typename TFunction, typename TValue, typename TValue2, typename TPrefix>
+  Printer(TSerial &serial, const TLine &line, const TFunction &function, const TValue &content, const TValue2 &content2, const TPrefix &prefix) {
 	serial.print(prefix);
-    serial.print(make_string<TLine>{}.data());
-	serial.print(function);
-	serial.print(": ");
-    serial.println(content);
+    serial.print(make_string<TFile>{}.data());
+    serial.print(line);
+    serial.print(": ");
+	if(content[0]) {
+		serial.print(function);
+		serial.print(": ");
+	    serial.print(content);
+	    serial.println(content2);
+	}
+	else {
+		serial.println(function);
+	}
+
 	serial.flush();
   }
 };
 }  // namespace ArduinoTrace
 
 
-#define STRINGIFY(X) #X
-#define CONCAT(X, Y) X##Y
+#define ARDUINOTRACE_STRINGIFY(X) #X
+#define ARDUINOTRACE_CONCAT(X, Y) X##Y
 
-#define ARDUINOTRACE_PRINT(id, prefix, line, function, content)               \
+#define ARDUINOTRACE_PRINT(prefix, file, line, function, content, content2)               \
   {                                                                           \
-    struct __line {                                                         \
-      constexpr static char const *data() { return line; }                  \
-    };                                                                        \
-    ArduinoTrace::Printer<__line> __tracer(ARDUINOTRACE_SERIAL, function, content, prefix); \
+    struct __file {                                                         \
+      constexpr static char const *data() { return file; }                  \
+    }; 																		\
+    ArduinoTrace::Printer<__file> __tracer(ARDUINOTRACE_SERIAL, line, function, content, content2, prefix); \
   }
 
 
 // Write traces to the Serial port
 //
-#define TRACE() 	   ARDUINOTRACE_PRINT(__COUNTER__, "    "			, STRINGIFY(__FILE__) ":" STRINGIFY(__LINE__) ": " STRINGIFY(__PRETTY_FUNCTION__), __PRETTY_FUNCTION__,  "")
-#define DEBUG(message) ARDUINOTRACE_PRINT(__COUNTER__, "    "			, STRINGIFY(__FILE__) ":" STRINGIFY(__LINE__) ": ", __PRETTY_FUNCTION__, message)
-#define DUMP(variable) ARDUINOTRACE_PRINT(__COUNTER__, "    "			, STRINGIFY(__FILE__) ":" STRINGIFY(__LINE__) ": " STRINGIFY(__PRETTY_FUNCTION__), #variable " = ", variable)
-#define THROW(message) ARDUINOTRACE_PRINT(__COUNTER__, "******* ERROR: ", STRINGIFY(__FILE__) ":" STRINGIFY(__LINE__) ": ", __PRETTY_FUNCTION__, message)
-
+#define TRACE() 	   ARDUINOTRACE_PRINT("    "			, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__,  "", "")
+#define DEBUG(message) ARDUINOTRACE_PRINT("    "			, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, String() + message, "")
+#define DUMP(variable) ARDUINOTRACE_PRINT("    "			, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, #variable " = ", variable)
+#define THROW(message) ARDUINOTRACE_PRINT("******* ERROR: "	, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, String() + message, "")
+#define PRINT(message) Serial.print(String() + message)
+#define PRINTLN(message) Serial.println(String() + message)
 
 
 // Initializes the Serial port
 //
 // Use this macro only if you want to call TRACE() at global scope,
 // in other cases, call Serial.begin() in your setup() function, as usual.
-#define ARDUINOTRACE_INITIALIZE(id, bauds) ArduinoTrace::Initializer CONCAT(__initializer, id)(ARDUINOTRACE_SERIAL, bauds);
+#define ARDUINOTRACE_INITIALIZE(id, bauds) ArduinoTrace::Initializer ARDUINOTRACE_CONCAT(__initializer, id)(ARDUINOTRACE_SERIAL, bauds);
 #define ARDUINOTRACE_INIT(bauds) ARDUINOTRACE_INITIALIZE(__COUNTER__, bauds);
 
 #else  // ie ARDUINOTRACE_ENABLE == 0
