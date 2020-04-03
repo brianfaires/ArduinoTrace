@@ -151,6 +151,7 @@ struct Printer {
 #define DEBUG(message) ARDUINOTRACE_PRINT("    "			, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, String() + message, "")
 #define DUMP(variable) ARDUINOTRACE_PRINT("    "			, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, #variable " = ", variable)
 #define THROW(message) ARDUINOTRACE_PRINT("******* ERROR: "	, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, String() + message, "")
+#define THROW(message, variable) THROW(message) DUMP(variable)
 #define PRINT(message) Serial.print(String() + message)
 #define PRINTLN(message) Serial.println(String() + message)
 
@@ -167,5 +168,6 @@ struct Printer {
 #define TRACE()
 #define DUMP(variable)
 #define THROW(message)
+#define THROW(message, variable)
 #define DEBUG(message)
 #endif
