@@ -152,8 +152,8 @@ struct Printer {
 #define DUMP(variable) ARDUINOTRACE_PRINT("    "			, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, #variable " = ", variable)
 #define THROW(message) ARDUINOTRACE_PRINT("******* ERROR: "	, __FILE__ ":", __LINE__, __PRETTY_FUNCTION__, String() + message, "")
 #define THROW_DUMP(message, variable) THROW(message) DUMP(variable)
-#define PRINT(message) Serial.print(String() + message)
-#define PRINTLN(message) Serial.println(String() + message)
+#define PRINT(message) Serial.print(String() + message);
+#define PRINTLN(message) Serial.println(String() + message);
 
 
 // Initializes the Serial port
