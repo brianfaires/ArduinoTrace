@@ -154,7 +154,12 @@ struct Printer {
 #define THROW_DUMP(message, variable) THROW(message) DUMP(variable)
 #define PRINT(message) Serial.print(String() + message);
 #define PRINTLN(message) Serial.println(String() + message);
-
+#define ASSERT(condition) if(!(condition)) { THROW(F("!!Assert failed!! ")) }
+#define ASSERT_EQUAL(x, y) if((x) != (y)) { THROW(F("!!Assert failed!! ") + x + " != " + y) }
+#define ASSERT_GREATERTHAN(x, y) if((x) <= (y)) { THROW(F("!!Assert failed!! ") + x + " <= " + y) }
+#define ASSERT_GREATERTHANOREQUAL(x, y) if((x) < (y)) { THROW(F("!!Assert failed!! ") + x + " < " + y) }
+#define ASSERT_LESSTHAN(x, y) if((x) >= (y)) { THROW(F("!!Assert failed!! ") + x + " >= " + y) }
+#define ASSERT_LESSTHANOREQUAL(x, y) if((x) > (y)) { THROW(F("!!Assert failed!! ") + x + " > " + y) }
 
 // Initializes the Serial port
 //
